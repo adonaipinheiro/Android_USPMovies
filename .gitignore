@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# TMDB secrets — nunca commitar
+**/secrets.properties
