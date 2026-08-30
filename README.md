@@ -1,50 +1,106 @@
-# USPMovies — Android (Kotlin/Jetpack Compose)
+# USPMovies — Android 🎬
 
-Catálogo de filmes (TMDB) construído como material didático do curso **Arquitetura Mobile I-II** (MBA USP Esalq). Mesma arquitetura das versões iOS (Swift) e React Native — muda só o "sotaque" da linguagem.
+![Platform](https://img.shields.io/badge/platform-Android-3ddc84)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.2-7f52ff)
+![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-Material_3-4285f4)
+![minSdk](https://img.shields.io/badge/minSdk-24-green)
+![compileSdk](https://img.shields.io/badge/compileSdk-37-green)
+![Architecture](https://img.shields.io/badge/arquitetura-Clean_+_MVVM_(4_camadas)-8a2be2)
+
+Catálogo de filmes consumindo a API do **TMDB**, em Kotlin/Jetpack Compose. É a
+stack Android do app de referência do curso **Arquitetura Mobile I‑II** (MBA em
+Engenharia de Software — USP/Esalq). O mesmo escopo funcional e a **mesma
+arquitetura** são implementados em paralelo em três stacks — muda só o "sotaque"
+da linguagem.
+
+> Projeto didático. O foco é a organização em camadas — não uma publicação real
+> na loja.
+
+## Projetos irmãos
+
+| Stack | Repositório | Status |
+|---|---|---|
+| React Native | [`adonaipinheiro/RN_USPMovies`](https://github.com/adonaipinheiro/RN_USPMovies) | testes 100% · CI/CD (Android) |
+| **Android nativo** | `adonaipinheiro/Android_USPMovies` | versão inicial funcional |
+| iOS nativo | [`adonaipinheiro/iOS_USPMovies`](https://github.com/adonaipinheiro/iOS_USPMovies) | versão inicial funcional |
+
+## Funcionalidades
+
+| # | Feature | Detalhe |
+|---|---|---|
+| F1 | Lista de populares | paginação |
+| F2 | Busca | com debounce |
+| F3 | Detalhe do filme | — |
+| F4 | Favoritar / desfavoritar | persistido em Room, funciona offline |
+| F5 | Tela de favoritos | lê o snapshot local |
+| F6 | Cache offline dos populares | Room, dentro do repositório |
+
+Toda tela de dados trata os estados **loading / data / empty / error**.
 
 ## Configurar a API key da TMDB
 
-1. Crie uma conta gratuita em https://developer.themoviedb.org e gere um **API Read Access Token** (token v4, não a `api_key` v3).
+1. Crie uma conta em https://developer.themoviedb.org e gere um **API Read Access
+   Token** (token v4, não a `api_key` v3).
 2. Copie o arquivo de exemplo:
    ```bash
    cp app/secrets.properties.example app/secrets.properties
    ```
-3. Abra `app/secrets.properties` e preencha `TMDB_ACCESS_TOKEN` com o seu token.
-4. `secrets.properties` já está no `.gitignore` — nunca será commitado. O valor é exposto ao código via `BuildConfig.TMDB_ACCESS_TOKEN` (gerado a partir desse arquivo em tempo de build).
+3. Preencha `TMDB_ACCESS_TOKEN` em `app/secrets.properties`. O arquivo está no
+   `.gitignore`; o valor é exposto ao código via `BuildConfig.TMDB_ACCESS_TOKEN`
+   (gerado em tempo de build).
+
+Sem esse passo, `BuildConfig.TMDB_ACCESS_TOKEN` fica vazio e as chamadas à TMDB
+retornam 401.
 
 ## Rodar
 
-Abra o projeto no Android Studio (ou rode `./gradlew :app:assembleDebug`) e instale num emulador/dispositivo com Android 15+ (compileSdk 37). Sem o passo acima, `BuildConfig.TMDB_ACCESS_TOKEN` fica vazio e as chamadas à TMDB retornam 401 — configure a chave antes de rodar.
+Abra no Android Studio ou use a linha de comando. Emulador/dispositivo com API 24+.
+
+```bash
+./gradlew :app:assembleDebug        # build
+./gradlew :app:installDebug         # instala no device conectado
+```
 
 ## Arquitetura — 4 camadas
 
 Regra de dependência: tudo aponta para o **Domain**.
 
 ```
-Presentation → Domain ← Repositories → Infra
+presentation ──► domain ◄── repositories ──► infra
 ```
 
-- **Domain** (`domain/`): entidade `Movie`, casos de uso (`GetPopularMovies`, `SearchMovies`, `GetMovieDetails`, `ToggleFavorite`, `GetFavorites`, `ObserveIsFavorite`) e as interfaces `MoviesRepository`/`FavoritesRepository`. Kotlin puro — sem import de Android/Retrofit/Room.
-- **Repositories** (`repositories/`): implementa as interfaces do domínio. Conhece o vocabulário do domínio (fala de `Movie`) e usa o `Infra` por baixo — DTOs da TMDB (Gson), mapeamento DTO↔entidade, entidades/DAOs Room (`FavoriteMovieEntity`, `CachedPopularMovieEntity`) e a lógica de cache/favoritos.
-- **Infra** (`infra/`): puramente técnico, não sabe o que é um "filme" — cliente HTTP (Retrofit/OkHttp, `TmdbApi`) e módulos Hilt de rede/banco.
-- **Presentation** (`presentation/`): telas Compose "burras" (`PopularScreen`, `SearchScreen`, `DetailScreen`, `FavoritesScreen`) + `ViewModel`s (`@HiltViewModel`) com `StateFlow`, que concentram a lógica de tela. Navegação desacoplada via `AppCoordinator` (`navigation/`).
-- **DI**: Hilt monta o grafo — `RepositoryModule` liga `domain` a `repositories` (`@Binds`), `NetworkModule`/`DatabaseModule` ficam em `infra`.
+| Camada | Papel | Conteúdo |
+|---|---|---|
+| `domain/` | regras e contratos, Kotlin puro (sem Android/Retrofit/Room) | entidade `Movie`; interfaces `MoviesRepository` / `FavoritesRepository`; casos de uso `GetPopularMovies`, `SearchMovies`, `GetMovieDetails`, `ToggleFavorite`, `GetFavorites`, `ObserveIsFavorite` |
+| `repositories/` | implementam os contratos do domínio; falam de `Movie` | DTOs da TMDB (Gson), mapeamento DTO↔entidade, entidades/DAOs Room (`FavoriteMovieEntity`, `CachedPopularMovieEntity`), lógica de cache e favoritos, `RepositoryModule` (`@Binds`) |
+| `infra/` | encanamento técnico, não sabe o que é um "filme" | `TmdbApi` (Retrofit/OkHttp), módulos Hilt de rede e banco |
+| `presentation/` | telas Compose "burras" + `ViewModel`s | `PopularScreen`, `SearchScreen`, `DetailScreen`, `FavoritesScreen`; `@HiltViewModel` + `StateFlow`; navegação desacoplada via `AppCoordinator` (`navigation/`) |
+
+**DI:** Hilt monta o grafo — `RepositoryModule` liga `domain` a `repositories`,
+`NetworkModule` / `DatabaseModule` ficam em `infra`.
 
 ## Stack
 
-Jetpack Compose (Material 3) · ViewModel + StateFlow · Hilt · Retrofit + Gson · Room · Coroutines/Flow · Navigation Compose (rotas tipadas com `kotlinx.serialization`) · Coil 3.
-
-## Funcionalidades
-
-F1 populares (paginado) · F2 busca com debounce · F3 detalhe · F4 favoritar (offline) · F5 tela de favoritos · F6 cache offline de populares (Room).
+Jetpack Compose (Material 3) · ViewModel + StateFlow · Hilt (KSP) · Retrofit +
+Gson · Room · Coroutines/Flow · Navigation Compose com rotas tipadas
+(`kotlinx.serialization`) · Coil 3.
 
 ## Notas de compatibilidade (ao configurar do zero)
 
-- **AGP 9 "built-in Kotlin"**: o KSP (Room/Hilt) ainda registra source sets pela API antiga do Kotlin Gradle Plugin, incompatível por padrão com o Kotlin embutido do AGP 9. Isso já está resolvido via `android.disallowKotlinSourceSets=false` em `gradle.properties`.
-- **Coil 3.5.0** traz `kotlin-stdlib:2.4.0` como dependência, mais novo que o compilador Kotlin do projeto (2.2.10) — isso já está resolvido forçando a versão do `kotlin-stdlib` em `app/build.gradle.kts`.
-- Optou-se por **Gson** em vez de `kotlinx.serialization` para o conversor do Retrofit, para evitar fricção de visibilidade Kotlin (`internal`) na integração `converter-kotlinx-serialization` nessa combinação de versões.
+- **AGP 9 "built-in Kotlin"**: o KSP (Room/Hilt) registra source sets pela API
+  antiga do Kotlin Gradle Plugin, incompatível por padrão com o Kotlin embutido
+  do AGP 9. Resolvido com `android.disallowKotlinSourceSets=false` em
+  `gradle.properties`.
+- **Coil 3.5.0** puxa `kotlin-stdlib:2.4.0`, mais novo que o compilador Kotlin do
+  projeto (2.2.10). Resolvido forçando a versão do `kotlin-stdlib` em
+  `app/build.gradle.kts`.
+- Optou-se por **Gson** em vez de `kotlinx.serialization` no conversor do Retrofit
+  para evitar fricção de visibilidade Kotlin (`internal`) na integração
+  `converter-kotlinx-serialization` nessa combinação de versões.
 
 ## Próximos passos
 
-- Testes unitários dos casos de uso com repositórios mockados (JUnit + MockK) — ainda não incluídos nesta versão inicial.
-- `COMPARACAO.md` na raiz do curso, depois que as 3 stacks tiverem uma versão inicial.
+- Testes unitários dos casos de uso com repositórios mockados (JUnit + MockK) —
+  ainda não incluídos (a stack RN já tem cobertura 100%, serve de referência).
+- CI/CD no padrão do repo RN, se fizer sentido para a aula.
+- `COMPARACAO.md` na raiz do curso, comparando as 3 stacks lado a lado.
