@@ -1,12 +1,14 @@
-package com.adonaipinheiro.android_uspmovies.repositories.local
+package com.adonaipinheiro.android_uspmovies.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.adonaipinheiro.android_uspmovies.domain.entities.Movie
 
-// camada: repositories — esquema de persistência (Room) para F4/F5.
-@Entity(tableName = "favorite_movies")
-data class FavoriteMovieEntity(
+// camada: data — esquema de cache offline (F6) + conversão de/para Movie.
+// O mapeamento fica junto da entidade (não em data/mapper) porque é
+// conversão de persistência local, não de payload de rede.
+@Entity(tableName = "cached_popular_movies")
+data class CachedPopularMovieEntity(
     @PrimaryKey val id: Int,
     val title: String,
     val posterPath: String?,
@@ -14,7 +16,7 @@ data class FavoriteMovieEntity(
     val voteAverage: Double,
     val releaseYear: String?,
     val genres: List<String>,
-    val addedAt: Long
+    val position: Int
 ) {
     fun toDomain(): Movie = Movie(
         id = id,
@@ -27,7 +29,7 @@ data class FavoriteMovieEntity(
     )
 
     companion object {
-        fun fromDomain(movie: Movie, addedAt: Long = System.currentTimeMillis()) = FavoriteMovieEntity(
+        fun fromDomain(movie: Movie, position: Int) = CachedPopularMovieEntity(
             id = movie.id,
             title = movie.title,
             posterPath = movie.posterPath,
@@ -35,7 +37,7 @@ data class FavoriteMovieEntity(
             voteAverage = movie.voteAverage,
             releaseYear = movie.releaseYear,
             genres = movie.genres,
-            addedAt = addedAt
+            position = position
         )
     }
 }

@@ -1,13 +1,17 @@
-package com.adonaipinheiro.android_uspmovies.repositories
+package com.adonaipinheiro.android_uspmovies.repository
 
+import com.adonaipinheiro.android_uspmovies.data.local.CachedPopularMovieDao
+import com.adonaipinheiro.android_uspmovies.data.local.CachedPopularMovieEntity
+import com.adonaipinheiro.android_uspmovies.data.mapper.toDomain
+import com.adonaipinheiro.android_uspmovies.data.remote.TmdbApi
 import com.adonaipinheiro.android_uspmovies.domain.entities.Movie
 import com.adonaipinheiro.android_uspmovies.domain.repositories.MoviesRepository
-import com.adonaipinheiro.android_uspmovies.infra.network.TmdbApi
-import com.adonaipinheiro.android_uspmovies.repositories.local.CachedPopularMovieDao
-import com.adonaipinheiro.android_uspmovies.repositories.local.CachedPopularMovieEntity
 import javax.inject.Inject
 
-// camada: repositories — implementa o protocolo do domínio usando o Infra.
+// camada: repository — implementa o contrato do domain orquestrando as
+// fontes de data (remota via TmdbApi, local via CachedPopularMovieDao).
+// A política de negócio (fallback offline) mora aqui, não em data: data só
+// sabe buscar/gravar, quem decide "quando usar o cache" é o repository.
 class MoviesRepositoryImpl @Inject constructor(
     private val api: TmdbApi,
     private val cachedPopularMovieDao: CachedPopularMovieDao

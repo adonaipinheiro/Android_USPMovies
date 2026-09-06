@@ -1,8 +1,8 @@
-package com.adonaipinheiro.android_uspmovies.navigation
+package com.adonaipinheiro.android_uspmovies.presentation.navigation
 
 import kotlinx.serialization.Serializable
 
-// camada: presentation — rotas tipadas (Navigation Compose).
+// camada: presentation (navegação) — rotas tipadas (Navigation Compose).
 @Serializable
 data object PopularRoute
 

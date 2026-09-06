@@ -1,4 +1,4 @@
-package com.adonaipinheiro.android_uspmovies.repositories.local
+package com.adonaipinheiro.android_uspmovies.data.local
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
+// camada: data — acesso local (Room) aos favoritos.
 @Dao
 interface FavoriteMovieDao {
     @Query("SELECT * FROM favorite_movies ORDER BY addedAt DESC")

@@ -1,10 +1,11 @@
-package com.adonaipinheiro.android_uspmovies.repositories.local
+package com.adonaipinheiro.android_uspmovies.data.local
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
+// camada: data — acesso local (Room) ao cache de populares.
 @Dao
 interface CachedPopularMovieDao {
     @Query("SELECT * FROM cached_popular_movies ORDER BY position ASC LIMIT 40")

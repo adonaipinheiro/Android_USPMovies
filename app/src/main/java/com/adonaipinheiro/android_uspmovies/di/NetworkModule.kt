@@ -1,6 +1,7 @@
-package com.adonaipinheiro.android_uspmovies.infra.network
+package com.adonaipinheiro.android_uspmovies.di
 
 import com.adonaipinheiro.android_uspmovies.BuildConfig
+import com.adonaipinheiro.android_uspmovies.data.remote.TmdbApi
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -13,7 +14,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
-// camada: infra — plumbing técnica genérica, não conhece o domínio.
+// camada: DI — monta o encanamento de rede (Gson/OkHttp/Retrofit, que
+// seriam infra genérica) e já entrega o TmdbApi pronto (que é data,
+// pois conhece MovieDto). Por misturar as duas coisas, este módulo é DI,
+// não infra: é o único lugar que liga o genérico ao específico do app.
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {

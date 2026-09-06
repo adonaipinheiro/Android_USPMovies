@@ -1,8 +1,9 @@
-package com.adonaipinheiro.android_uspmovies.repositories.dto
+package com.adonaipinheiro.android_uspmovies.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
-// camada: repositories — o domínio nunca vê o JSON cru da TMDB.
+// camada: data — formato bruto da resposta da TMDB (JSON); o domínio nunca
+// vê isso diretamente, só a entidade Movie mapeada pelo data/mapper.
 data class MoviesPageDto(
     val page: Int,
     val results: List<MovieDto>
