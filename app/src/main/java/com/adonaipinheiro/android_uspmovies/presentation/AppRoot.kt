@@ -20,11 +20,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavDestination.Companion.hasRoute
-import com.adonaipinheiro.android_uspmovies.navigation.DetailRoute
-import com.adonaipinheiro.android_uspmovies.navigation.FavoritesRoute
-import com.adonaipinheiro.android_uspmovies.navigation.PopularRoute
-import com.adonaipinheiro.android_uspmovies.navigation.SearchRoute
-import com.adonaipinheiro.android_uspmovies.navigation.rememberAppCoordinator
+import com.adonaipinheiro.android_uspmovies.presentation.navigation.DetailRoute
+import com.adonaipinheiro.android_uspmovies.presentation.navigation.FavoritesRoute
+import com.adonaipinheiro.android_uspmovies.presentation.navigation.PopularRoute
+import com.adonaipinheiro.android_uspmovies.presentation.navigation.SearchRoute
+import com.adonaipinheiro.android_uspmovies.presentation.navigation.rememberAppCoordinator
 import com.adonaipinheiro.android_uspmovies.presentation.detail.DetailScreen
 import com.adonaipinheiro.android_uspmovies.presentation.favorites.FavoritesScreen
 import com.adonaipinheiro.android_uspmovies.presentation.popular.PopularScreen

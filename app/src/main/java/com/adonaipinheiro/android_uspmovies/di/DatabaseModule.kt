@@ -1,10 +1,10 @@
-package com.adonaipinheiro.android_uspmovies.infra.local
+package com.adonaipinheiro.android_uspmovies.di
 
 import android.content.Context
 import androidx.room.Room
-import com.adonaipinheiro.android_uspmovies.repositories.local.AppDatabase
-import com.adonaipinheiro.android_uspmovies.repositories.local.CachedPopularMovieDao
-import com.adonaipinheiro.android_uspmovies.repositories.local.FavoriteMovieDao
+import com.adonaipinheiro.android_uspmovies.data.local.AppDatabase
+import com.adonaipinheiro.android_uspmovies.data.local.CachedPopularMovieDao
+import com.adonaipinheiro.android_uspmovies.data.local.FavoriteMovieDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +12,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-// camada: infra — plumbing técnica genérica, não conhece o domínio.
+// camada: DI — instancia o Room (Room.databaseBuilder seria infra genérica
+// se não apontasse pro AppDatabase::class, que já é o schema de filmes) e
+// expõe os DAOs concretos. Mesmo racional do NetworkModule.
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {

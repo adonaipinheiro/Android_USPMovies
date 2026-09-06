@@ -8,7 +8,7 @@ import com.adonaipinheiro.android_uspmovies.domain.usecases.GetMovieDetails
 import com.adonaipinheiro.android_uspmovies.domain.usecases.ObserveIsFavorite
 import com.adonaipinheiro.android_uspmovies.domain.usecases.ToggleFavorite
 import androidx.navigation.toRoute
-import com.adonaipinheiro.android_uspmovies.navigation.DetailRoute
+import com.adonaipinheiro.android_uspmovies.presentation.navigation.DetailRoute
 import com.adonaipinheiro.android_uspmovies.presentation.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow

@@ -1,9 +1,11 @@
-package com.adonaipinheiro.android_uspmovies.repositories
+package com.adonaipinheiro.android_uspmovies.data.mapper
 
 import com.adonaipinheiro.android_uspmovies.domain.entities.Movie
-import com.adonaipinheiro.android_uspmovies.repositories.dto.MovieDto
+import com.adonaipinheiro.android_uspmovies.data.remote.dto.MovieDto
 
-// camada: repositories — mapeia DTO(TMDB) ↔ entidade de domínio.
+// camada: data — mapeia DTO(TMDB) ↔ entidade de domínio. Fica em data (não
+// em repository) porque é conversão de formato de uma fonte específica,
+// não decisão de política de negócio (isso é do repository).
 fun MovieDto.toDomain(): Movie = Movie(
     id = id,
     title = title,

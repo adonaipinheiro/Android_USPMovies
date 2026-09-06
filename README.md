@@ -5,7 +5,7 @@
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-Material_3-4285f4)
 ![minSdk](https://img.shields.io/badge/minSdk-24-green)
 ![compileSdk](https://img.shields.io/badge/compileSdk-37-green)
-![Architecture](https://img.shields.io/badge/arquitetura-Clean_+_MVVM_(4_camadas)-8a2be2)
+![Architecture](https://img.shields.io/badge/arquitetura-Clean_+_MVVM_(6_camadas)-8a2be2)
 
 Catálogo de filmes consumindo a API do **TMDB**, em Kotlin/Jetpack Compose. É a
 stack Android do app de referência do curso **Arquitetura Mobile I‑II** (MBA em
@@ -61,23 +61,28 @@ Abra no Android Studio ou use a linha de comando. Emulador/dispositivo com API 2
 ./gradlew :app:installDebug         # instala no device conectado
 ```
 
-## Arquitetura — 4 camadas
+## Arquitetura — 6 camadas
 
-Regra de dependência: tudo aponta para o **Domain**.
+Regra de dependência: tudo aponta para o **Domain**. `repository` orquestra as
+fontes de `data`, que por sua vez se apoiam no encanamento genérico de `infra`.
+`DI` é o único ponto do app que enxerga as seis camadas ao mesmo tempo — é ele
+quem "liga os fios" entre `domain`, `repository`, `data` e `infra`.
 
 ```
-presentation ──► domain ◄── repositories ──► infra
+presentation ──► domain ◄── repository ──► data ──► infra
+                              ▲
+                              │
+                             DI  (único lugar que conhece todas as camadas)
 ```
 
 | Camada | Papel | Conteúdo |
 |---|---|---|
 | `domain/` | regras e contratos, Kotlin puro (sem Android/Retrofit/Room) | entidade `Movie`; interfaces `MoviesRepository` / `FavoritesRepository`; casos de uso `GetPopularMovies`, `SearchMovies`, `GetMovieDetails`, `ToggleFavorite`, `GetFavorites`, `ObserveIsFavorite` |
-| `repositories/` | implementam os contratos do domínio; falam de `Movie` | DTOs da TMDB (Gson), mapeamento DTO↔entidade, entidades/DAOs Room (`FavoriteMovieEntity`, `CachedPopularMovieEntity`), lógica de cache e favoritos, `RepositoryModule` (`@Binds`) |
-| `infra/` | encanamento técnico, não sabe o que é um "filme" | `TmdbApi` (Retrofit/OkHttp), módulos Hilt de rede e banco |
-| `presentation/` | telas Compose "burras" + `ViewModel`s | `PopularScreen`, `SearchScreen`, `DetailScreen`, `FavoritesScreen`; `@HiltViewModel` + `StateFlow`; navegação desacoplada via `AppCoordinator` (`navigation/`) |
-
-**DI:** Hilt monta o grafo — `RepositoryModule` liga `domain` a `repositories`,
-`NetworkModule` / `DatabaseModule` ficam em `infra`.
+| `data/` | fontes de dados — fala de `Movie`, mas não decide política de negócio | `TmdbApi` e `MovieDto` (`data/remote`), entidades/DAOs Room `FavoriteMovieEntity`/`CachedPopularMovieEntity` (`data/local`), mapeamento DTO↔entidade (`data/mapper`) |
+| `infra/` | encanamento técnico genérico, não pode conhecer `domain`/`Movie` | hoje só conceitual (ver `infra/README.md`); os builders de OkHttp/Retrofit/Room do app já entregam peças específicas de filme, por isso vivem em `di/` |
+| `repository/` | implementa os contratos do domínio orquestrando uma ou mais fontes de `data` | `MoviesRepositoryImpl` (com fallback offline: página 1 sem rede cai pro cache local), `FavoritesRepositoryImpl` |
+| `di/` | composição do grafo Hilt — único lugar que conhece todas as camadas | `RepositoryModule` (`@Binds` domain→repository), `NetworkModule`, `DatabaseModule` |
+| `presentation/` | telas Compose "burras" + `ViewModel`s + navegação | `PopularScreen`, `SearchScreen`, `DetailScreen`, `FavoritesScreen`; `@HiltViewModel` + `StateFlow`; navegação desacoplada via `AppCoordinator` (`presentation/navigation/`) |
 
 ## Stack
 

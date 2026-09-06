@@ -1,13 +1,14 @@
-package com.adonaipinheiro.android_uspmovies.repositories
+package com.adonaipinheiro.android_uspmovies.repository
 
+import com.adonaipinheiro.android_uspmovies.data.local.FavoriteMovieDao
+import com.adonaipinheiro.android_uspmovies.data.local.FavoriteMovieEntity
 import com.adonaipinheiro.android_uspmovies.domain.entities.Movie
 import com.adonaipinheiro.android_uspmovies.domain.repositories.FavoritesRepository
-import com.adonaipinheiro.android_uspmovies.repositories.local.FavoriteMovieDao
-import com.adonaipinheiro.android_uspmovies.repositories.local.FavoriteMovieEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-// camada: repositories — implementa o protocolo do domínio usando o Infra.
+// camada: repository — implementa o contrato do domain usando a fonte
+// local (data/local). Sem fallback aqui: favoritos só existem localmente.
 class FavoritesRepositoryImpl @Inject constructor(
     private val dao: FavoriteMovieDao
 ) : FavoritesRepository {
